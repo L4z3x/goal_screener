@@ -1,0 +1,2 @@
+Pyqt5
+pillow
