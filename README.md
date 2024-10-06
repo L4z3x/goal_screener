@@ -1,6 +1,7 @@
 # Gaol_Screener
 a simple python app built with pyqt and pillow to boost your production 
 by visualzing your goals/quest in the home background and tracking them
+(Ispired by AC valhala quest menu BTW)
  ## Example
  if this is your desktop background:
  
@@ -18,8 +19,8 @@ by visualzing your goals/quest in the home background and tracking them
     
  execute the script init.sh:
  	
-  	./init.sh
- run the app:
+  	sudo ./init.sh
+ to run the app:
  	
   	sudo python app.py
 
