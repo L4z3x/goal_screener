@@ -1,3 +1,4 @@
+import ctypes.wintypes
 import sys,ctypes,os,json
 from PyQt5.QtWidgets import (
     QApplication, QWidget, QLabel, QPushButton, QFileDialog,
@@ -11,11 +12,14 @@ import traceback
 class WallpaperApp(QWidget):
     mainQ = {}
     sideQ = {}
+    TRACKING_COLOR=(72, 149, 147)
     selected_item = ''
     tracked_item = ''
     image_path =''
-    ICON_PATH ="./quest_icon.png"
-    FONT = "/home/lazex/ttf-comic-mono-git/src/comic-mono-font/ComicMono.ttf"
+    path = os.getcwd()
+    ICON_PATH = os.path.join(path,"./assets/quest_icon.png")
+    FONT =os.path.join(path,"./assets/ComicMono.ttf")
+    FONT_B = os.path.join(path,"./assets/ComicMono-Bold.ttf")
     def __init__(self):
         super().__init__()
         self.initUI()
@@ -136,7 +140,8 @@ class WallpaperApp(QWidget):
         if item in self.sideQ:
             del self.sideQ[item]
         self.update_quest_list()
-        self.on_submit()
+        if self.mainQ or self.sideQ:
+            self.on_submit()
 
     def retreiveD(self):
         with open("Quest.json", "r") as file:
@@ -222,7 +227,7 @@ class WallpaperApp(QWidget):
             icon_path = self.ICON_PATH
             font = ImageFont.truetype(self.FONT, 60)  
             font2 = ImageFont.truetype(self.FONT, 35 )  
-            font3 = ImageFont.truetype("/home/lazex/ttf-comic-mono-git/src/comic-mono-font/ComicMono-Bold.ttf", 80 )  
+            font3 = ImageFont.truetype(self.FONT_B, 80 )  
 
             icon = Image.open(icon_path)
             icon_size = 100
@@ -299,20 +304,23 @@ class WallpaperApp(QWidget):
                 
                 des = self.sideQ[quest]
                 text,text2 = cut_text(quest,des)
-                text = f"{quest}"
-                text2 = f"{des}"
-                
-                # Draw rounded rectangle for side quest
-                draw.rounded_rectangle(
-                    [(x_side - 20, y_side - 20), (x_side + 900, y_side + 150)],
-                    fill=(40, 39, 50), outline="black", width=3, radius=20
-                )
-                
                 # Draw icon (aligned to the right)
                 if quest == self.tracked_item:
+                    draw.rounded_rectangle(
+                        [(x_side - 20, y_side - 20), (x_side + 900, y_side + 150)],
+                        fill=(40, 39, 50), outline=self.TRACKING_COLOR, width=3, radius=20
+                    )
                     icon_x = x_side   # Adjust icon position relative to the text
                     img.paste(icon, (int(icon_x), int(y_side + 10)), icon)
-
+                
+                else:
+                # Draw rounded rectangle for side quest
+                    draw.rounded_rectangle(
+                        [(x_side - 20, y_side - 20), (x_side + 900, y_side + 150)],
+                        fill=(40, 39, 50), outline="black", width=3, radius=20
+                    )
+                
+                
                 # Draw text (aligned to the right)
                 draw.text((x_side + 120, y_side + 25), text, fill="white", font=font)
                 draw.text((x_side + 120, y_side+ 95), text2, fill="white", font=font2)
@@ -330,18 +338,18 @@ class WallpaperApp(QWidget):
         except Exception as e:
             error_trace = traceback.format_exc()
             QMessageBox.critical(self, "Error", f"Failed to generate image: {e} {error_trace}")
-
+    print(ctypes.windll.user32)
     def set_wallpaper_windows(self, image_path):
         try:
-            ctypes.windll.user32.SystemParametersInfoW(20, 0, image_path, 3)
+            ctypes.windll.user32.SystemParametersInfoW(20, 0, os.path.join(self.path,image_path), 3)
             QMessageBox.information(self, "Success", "Wallpaper set successfully!")
         except Exception as e:
             QMessageBox.critical(self, "Error", f"Failed to set wallpaper: {e}")
 
     def set_wallpaper_linux(self, image_path):
         try:
-            os.system(f"gsettings set org.gnome.desktop.background picture-uri /home/lazex/goal_Screener/{image_path}")
-            os.system(f"gsettings set org.gnome.desktop.background picture-uri-dark /home/lazex/goal_Screener/{image_path}")
+            os.system(f"gsettings set org.gnome.desktop.background picture-uri {os.path.join(self.path,image_path)}")
+            os.system(f"gsettings set org.gnome.desktop.background picture-uri-dark {os.path.join(self.path,image_path)}")
             QMessageBox.information(self, "Success", f"Wallpaper set successfully! {image_path}")
         except Exception as e:
             QMessageBox.critical(self, "Error", f"Failed to set wallpaper: {e}")
