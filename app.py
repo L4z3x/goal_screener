@@ -144,7 +144,7 @@ class WallpaperApp(QWidget):
             self.on_submit()
 
     def retreiveD(self):
-        with open("Quest.json", "r") as file:
+        with open("./assets/Quest.json", "r") as file:
             try:
                 data = json.load(file)
                 self.mainQ = data[0]
@@ -159,7 +159,7 @@ class WallpaperApp(QWidget):
                 print(f'Error:{e}')
             
     def writeD(self):
-        with open("./Quest.json", "w") as file:
+        with open("./assets/Quest.json", "w") as file:
             data = [self.mainQ, self.sideQ,self.tracked_item,self.image_path]
             json.dump(data, file, indent=4)
 
@@ -331,14 +331,14 @@ class WallpaperApp(QWidget):
                 y_side += text_gap
             
             # Save the output image
-            output_path = "output_image.png"
+            output_path = os.path.join(self.path,"assets/output_image.png")
             img.save(output_path)
             return output_path
         
         except Exception as e:
             error_trace = traceback.format_exc()
             QMessageBox.critical(self, "Error", f"Failed to generate image: {e} {error_trace}")
-    print(ctypes.windll.user32)
+
     def set_wallpaper_windows(self, image_path):
         try:
             ctypes.windll.user32.SystemParametersInfoW(20, 0, os.path.join(self.path,image_path), 3)
@@ -371,6 +371,7 @@ class WallpaperApp(QWidget):
         self.writeD()
         output_image = self.generate_image_with_text()
         if output_image:
+            print(output_image)
             self.set_wallpaper(output_image)
 
 
