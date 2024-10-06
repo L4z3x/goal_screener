@@ -12,12 +12,17 @@ import traceback
 class WallpaperApp(QWidget):
     mainQ = {}
     sideQ = {}
+    icon_size = 100
+    QUEST_LIMIT = 5
+    QUEST_BOX_LENGTH = 900
+    MAX_STR = 37
     TRACKING_COLOR=(72, 149, 147)
     selected_item = ''
     tracked_item = ''
     image_path =''
+    icon_path = "./assets/quest_icon.png"
     path = os.getcwd()
-    ICON_PATH = os.path.join(path,"./assets/quest_icon.png")
+    ICON_PATH = os.path.join(path,icon_path)
     FONT =os.path.join(path,"./assets/ComicMono.ttf")
     FONT_B = os.path.join(path,"./assets/ComicMono-Bold.ttf")
     def __init__(self):
@@ -230,8 +235,7 @@ class WallpaperApp(QWidget):
             font3 = ImageFont.truetype(self.FONT_B, 80 )  
 
             icon = Image.open(icon_path)
-            icon_size = 100
-            icon = icon.resize((icon_size, icon_size))
+            icon = icon.resize((self.icon_size, self.icon_size))
             
             def cut_text(quest, des):
                 def cut_at_space(text, max_len):
@@ -244,18 +248,17 @@ class WallpaperApp(QWidget):
                             return text[:max_len] + "..."
                     return text
 
-                quest = cut_at_space(quest, MAX_STR)
-                des = cut_at_space(des, MAX_STR)
+                quest = cut_at_space(quest, self.MAX_STR)
+                des = cut_at_space(des, self.MAX_STR)
                 
                 return quest, des
 
             # Image size
             W, H = img.size
             text_gap = 200 
-
+            print(W,H)
             # quest limit
-            QUEST_LIMIT = 5
-            MAX_STR = 37
+            
             # Coordinates for main quests (left side)
             y_main = int(W / 7)
             x_main = int(H / 5)  # Align to the left side
@@ -272,7 +275,7 @@ class WallpaperApp(QWidget):
 
             # Render Main Quests on the left
             for i, quest in enumerate(self.mainQ.keys()):
-                if i == QUEST_LIMIT:
+                if i == self.QUEST_LIMIT:
                     break  # Limit to 4 main quests
                 des = self.mainQ[quest]
                 text,text2 = cut_text(quest,des)
@@ -280,7 +283,7 @@ class WallpaperApp(QWidget):
                 
                 # Draw rounded rectangle for main quest
                 draw.rounded_rectangle(
-                    [(x_main  - 20, y_main - 20), (x_main + 900, y_main + 150)],
+                    [(x_main  - 20, y_main - 20), (x_main + self.QUEST_BOX_LENGTH, y_main + 150)],
                     fill=(40, 39, 50), outline="black", width=3, radius=20
                 )
                 
@@ -299,7 +302,7 @@ class WallpaperApp(QWidget):
             
             # Render Side Quests on the right
             for i, quest in enumerate(self.sideQ.keys()):
-                if i == QUEST_LIMIT:
+                if i == self.QUEST_LIMIT:
                     break  # Limit to 4 side quests
                 
                 des = self.sideQ[quest]
@@ -307,7 +310,7 @@ class WallpaperApp(QWidget):
                 # Draw icon (aligned to the right)
                 if quest == self.tracked_item:
                     draw.rounded_rectangle(
-                        [(x_side - 20, y_side - 20), (x_side + 900, y_side + 150)],
+                        [(x_side - 20, y_side - 20), (x_side + self.QUEST_BOX_LENGTH, y_side + 150)],
                         fill=(40, 39, 50), outline=self.TRACKING_COLOR, width=3, radius=20
                     )
                     icon_x = x_side   # Adjust icon position relative to the text
@@ -316,7 +319,7 @@ class WallpaperApp(QWidget):
                 else:
                 # Draw rounded rectangle for side quest
                     draw.rounded_rectangle(
-                        [(x_side - 20, y_side - 20), (x_side + 900, y_side + 150)],
+                        [(x_side - 20, y_side - 20), (x_side + self.QUEST_BOX_LENGTH, y_side + 150)],
                         fill=(40, 39, 50), outline="black", width=3, radius=20
                     )
                 

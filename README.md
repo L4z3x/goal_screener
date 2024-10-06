@@ -1,7 +1,10 @@
 # Gaol_Screener
 a simple python app built with pyqt and pillow to boost your production 
-by visualzing your goals/quest in the home background and tracking them
-(Ispired by AC valhala quest menu BTW)
+by visualzing your goals/quests in the home background and tracking them
+(Inspired by AC valhalla quest menu BTW)
+ ## Note
+ recommanded image size : 3840*2160
+ for linux machines, this app will work only on GTK-based DE (desktop enviroments)
  ## Example
  if this is your desktop background:
  
