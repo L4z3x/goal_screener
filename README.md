@@ -3,11 +3,14 @@ a simple python app built with pyqt and pillow to boost your production
 by visualzing your goals/quest in the home background and tracking them
  ## Example
  if this is your desktop background:
- ![Alt text](example/background.png)
+ 
  ![Logo](./example/background.png)
+ 
  then it will look like this, note that your background img should be clean to make good effect.
- ![Alt text](example/output_image.png)
+ (the little green icon points to the tracked quest)
+ 
  ![Logo](./example/output_image.png)
+ 
  ## Start
  clone the repo: 
   	
