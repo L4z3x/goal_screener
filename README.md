@@ -1,6 +1,13 @@
 # Gaol_Screener
 a simple python app built with pyqt and pillow to boost your production 
 by visualzing your goals/quest in the home background and tracking them
+ ## Example
+ if this is your desktop background:
+ ![Alt text](ex/background.png)
+ ![Logo](./ex/background.png)
+ then it will look like this, note that your background img should be clean to make good effect.
+ ![Alt text](ex/output_image.png)
+ ![Logo](./ex/output_image.png)
  ## Start
  clone the repo: 
   	
@@ -12,3 +19,4 @@ by visualzing your goals/quest in the home background and tracking them
  run the app:
  	
   	sudo python app.py
+
