@@ -19,6 +19,7 @@ by visualzing your goals/quests in the home background and tracking them
  clone the repo: 
   	
    	git clone https://github.com/L4z3x/goal_screener/
+    cd goal_screener
  
  if you use Linux (gtk-based DE)   
  execute the script init.sh:
@@ -32,13 +33,8 @@ for Windows
 create the file ./assets/Quest.json
 
     cd ./assets/
-    copy con Quest.json
+    echo NUL > Quest.json
 
-then create py venv and activate it
-
-    python -m venv goalenv
-    .\goalenv\Scripts\activate
-if you want to deactivate it, just type "deactivate"
 
 install pillow and Pyqt
 
