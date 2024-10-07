@@ -342,17 +342,17 @@ class WallpaperApp(QWidget):
             error_trace = traceback.format_exc()
             QMessageBox.critical(self, "Error", f"Failed to generate image: {e} {error_trace}")
 
-    def set_wallpaper_windows(self, image_path):
+    def set_wallpaper_windows(self):
         try:
-            ctypes.windll.user32.SystemParametersInfoW(20, 0, os.path.join(self.path,image_path), 3)
+            ctypes.windll.user32.SystemParametersInfoW(20, 0, os.path.join(self.path,self.image_path), 3)
             QMessageBox.information(self, "Success", "Wallpaper set successfully!")
         except Exception as e:
             QMessageBox.critical(self, "Error", f"Failed to set wallpaper: {e}")
 
-    def set_wallpaper_linux(self, image_path):
+    def set_wallpaper_linux(self):
         try:
-            os.system(f"gsettings set org.gnome.desktop.background picture-uri {os.path.join(self.path,image_path)}")
-            os.system(f"gsettings set org.gnome.desktop.background picture-uri-dark {os.path.join(self.path,image_path)}")
+            os.system(f"gsettings set org.gnome.desktop.background picture-uri {os.path.join(self.path,self.image_path)}")
+            os.system(f"gsettings set org.gnome.desktop.background picture-uri-dark {os.path.join(self.path,self.image_path)}")
             QMessageBox.information(self, "Success", f"Wallpaper set successfully! {image_path}")
         except Exception as e:
             QMessageBox.critical(self, "Error", f"Failed to set wallpaper: {e}")
@@ -375,7 +375,7 @@ class WallpaperApp(QWidget):
         output_image = self.generate_image_with_text()
         if output_image:
             print(output_image)
-            self.set_wallpaper(output_image)
+            self.set_wallpaper()
 
 
 def main():
