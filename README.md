@@ -19,7 +19,8 @@ by visualzing your goals/quests in the home background and tracking them
  clone the repo: 
   	
    	git clone https://github.com/L4z3x/goal_screener/
-    
+ 
+ if you use Linux (gtk-based DE)   
  execute the script init.sh:
  	
   	sudo ./init.sh
@@ -27,3 +28,21 @@ by visualzing your goals/quests in the home background and tracking them
  	
   	sudo python app.py
 
+for Windows
+create the file ./assets/Quest.json
+
+    cd ./assets/
+    copy con Quest.json
+
+then create py venv and activate it
+
+    python -m venv goalenv
+    .\goalenv\Scripts\activate
+if you want to deactivate it, just type "deactivate"
+
+install pillow and Pyqt
+
+    pip install -r requirement.txt   
+
+now you can run the app from (.\"windows app"\goalScreener)
+and don't forget to create a symlink (shortcut) for easy access.
