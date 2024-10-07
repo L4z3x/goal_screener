@@ -351,6 +351,7 @@ class WallpaperApp(QWidget):
 
     def set_wallpaper_linux(self, image_path):
         try:
+            print(f"gsettings set org.gnome.desktop.background picture-uri-dark {os.path.join(self.path,image_path)}")
             os.system(f"gsettings set org.gnome.desktop.background picture-uri {os.path.join(self.path,image_path)}")
             os.system(f"gsettings set org.gnome.desktop.background picture-uri-dark {os.path.join(self.path,image_path)}")
             QMessageBox.information(self, "Success", f"Wallpaper set successfully! {image_path}")
