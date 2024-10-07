@@ -13,7 +13,7 @@ by visualzing your goals/quests in the home background and tracking them
  then it will look like this, note that your background img should be clean to make good effect.
  (the little green icon points to the tracked quest)
  
- ![Logo](./example/output_image.png)
+ ![Logo](./example/output.png)
  
  ## Start
  clone the repo: 
