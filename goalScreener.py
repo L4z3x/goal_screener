@@ -6,9 +6,13 @@ from PyQt5.QtWidgets import (
     QTextEdit, QScrollArea
 )
 from PyQt5.QtGui import QPixmap, QColor
+from PyQt5 import QtGui
 from PIL import Image, ImageDraw, ImageFont
 import traceback 
 
+basedir = os.path.dirname(__file__)
+OUTPUT_IMG_PATH = os.path.join(basedir,"./assets/output_image.png")
+ICON_PATH  = os.path.join(basedir,"./assets/quest_icon.png")
 class WallpaperApp(QWidget):
     mainQ = {}
     sideQ = {}
@@ -20,11 +24,9 @@ class WallpaperApp(QWidget):
     selected_item = ''
     tracked_item = ''
     image_path =''
-    icon_path = "../assets/quest_icon.png"
-    path = os.getcwd()
-    ICON_PATH = os.path.join(path,icon_path)
-    FONT =os.path.join(path,"../assets/ComicMono.ttf")
-    FONT_B = os.path.join(path,"../assets/ComicMono-Bold.ttf")
+    FONT =os.path.join(basedir,"./assets/ComicMono.ttf")
+    FONT_B = os.path.join(basedir,"./assets/ComicMono-Bold.ttf")
+    JSON_PATH = os.path.join(basedir,"./assets/Quest.json")
     def __init__(self):
         super().__init__()
         self.initUI()
@@ -149,7 +151,7 @@ class WallpaperApp(QWidget):
             self.on_submit()
 
     def retreiveD(self):
-        with open("../assets/Quest.json", "r") as file:
+        with open(self.JSON_PATH, "r") as file:
             try:
                 data = json.load(file)
                 self.mainQ = data[0]
@@ -164,7 +166,7 @@ class WallpaperApp(QWidget):
                 print(f'Error:{e}')
             
     def writeD(self):
-        with open("../assets/Quest.json", "w") as file:
+        with open(self.JSON_PATH, "w") as file:
             data = [self.mainQ, self.sideQ,self.tracked_item,self.image_path]
             json.dump(data, file, indent=4)
 
@@ -226,15 +228,15 @@ class WallpaperApp(QWidget):
             self.img_label.setPixmap(pixmap.scaled(200, 200))
     
     def generate_image_with_text(self):
+    
         try:
             img = Image.open(self.image_path)
             draw = ImageDraw.Draw(img)
-            icon_path = self.ICON_PATH
             font = ImageFont.truetype(self.FONT, 60)  
             font2 = ImageFont.truetype(self.FONT, 35 )  
             font3 = ImageFont.truetype(self.FONT_B, 80 )  
 
-            icon = Image.open(icon_path)
+            icon = Image.open(ICON_PATH)
             icon = icon.resize((self.icon_size, self.icon_size))
             
             def cut_text(quest, des):
@@ -282,16 +284,21 @@ class WallpaperApp(QWidget):
                 
                 
                 # Draw rounded rectangle for main quest
-                draw.rounded_rectangle(
-                    [(x_main  - 20, y_main - 20), (x_main + self.QUEST_BOX_LENGTH, y_main + 150)],
-                    fill=(40, 39, 50), outline="black", width=3, radius=20
-                )
+                
                 
                 # Draw icon
                 if quest == self.tracked_item:
+                    draw.rounded_rectangle(
+                    [(x_main  - 20, y_main - 20), (x_main + self.QUEST_BOX_LENGTH, y_main + 150)],
+                    fill=(40, 39, 50), outline=self.TRACKING_COLOR, width=3, radius=20
+                    )
                     icon_x = x_main 
                     img.paste(icon, (int(icon_x), int(y_main + 10)), icon) 
-
+                else:   
+                    draw.rounded_rectangle(
+                    [(x_main  - 20, y_main - 20), (x_main + self.QUEST_BOX_LENGTH, y_main + 150)],
+                    fill=(40, 39, 50), outline="black", width=3, radius=20
+                    )
                 # Draw text
                 draw.text((x_main + 120, y_main + 25), text, fill="white", font=font)
                 draw.text((x_main + 120, y_main + 95), text2, fill="white", font=font2)
@@ -334,7 +341,7 @@ class WallpaperApp(QWidget):
                 y_side += text_gap
             
             # Save the output image
-            output_path = os.path.join(self.path,"../assets/output_image.png")
+            output_path = OUTPUT_IMG_PATH
             img.save(output_path)
             return output_path
         
@@ -351,9 +358,9 @@ class WallpaperApp(QWidget):
 
     def set_wallpaper_linux(self, image_path):
         try:
-            print(f"gsettings set org.gnome.desktop.background picture-uri-dark {os.path.join(self.path,image_path)}")
-            os.system(f"gsettings set org.gnome.desktop.background picture-uri {os.path.join(self.path,image_path)}")
-            os.system(f"gsettings set org.gnome.desktop.background picture-uri-dark {os.path.join(self.path,image_path)}")
+            #print(f"gsettings set org.gnome.desktop.background picture-uri-dark {os.path.join(basedir,image_path)}")
+            os.system(f"gsettings set org.gnome.desktop.background picture-uri {os.path.join(basedir,image_path)}")
+            os.system(f"gsettings set org.gnome.desktop.background picture-uri-dark {os.path.join(basedir,image_path)}")
             QMessageBox.information(self, "Success", f"Wallpaper set successfully! {image_path}")
         except Exception as e:
             QMessageBox.critical(self, "Error", f"Failed to set wallpaper: {e}")
@@ -382,6 +389,7 @@ class WallpaperApp(QWidget):
 def main():
     app = QApplication(sys.argv)
     window = WallpaperApp()
+    app.setWindowIcon(QtGui.QIcon(ICON_PATH))
     window.resize(1000, 800)  # Adjust window size
     window.show()
     sys.exit(app.exec_())
