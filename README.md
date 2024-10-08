@@ -20,25 +20,40 @@ by visualzing your goals/quests in the home background and tracking them
   	
    	git clone https://github.com/L4z3x/goal_screener/
     cd goal_screener
- 
- if you use Linux (gtk-based DE)   
- execute the script init.sh:
- 	
-  	sudo ./init.sh
- to run the app:
- 	
-  	sudo python app.py
+ ## install dependecies:
+ ### linux
+ debian:
+              
+    sudo apt install python3-pil python3-pyqt5
 
-for Windows
-create the file ./assets/Quest.json
+ arch:
+    
+    sudo pacman -S python-pil python-pyqt5
+ ### windows
 
-    cd ./assets/
-    echo NUL > Quest.json
+    pip install PyQt5 pillow
+    
+ ## Linux (gtk-based DE)   
+   ### Arch-Based Distros:
+      sudo pacman -U goalScreener-1.0-1-x86_64.pkg.tar.zst
 
+   ### Debian-Based Distros:
+      dpkg -i goalScreener.deb
+   
+## Windows
+ run the app Win_app/goalScreener
+ and it would be better to create a shortcut 
 
-install pillow and Pyqt
+## NOTE(linux):
+if the wallpaper does't seem to be set try running:
 
-    pip install -r requirement.txt   
+    gsettings get org.gnome.desktop.background picture-uri
+then take the output and run the following:
+    
+    gsettings set org.gnome.desktop.background picture-uri-dark (your output url)
 
-now you can run the app from (.\"windows app"\goalScreener)
-and don't forget to create a symlink (shortcut) for easy access.
+or if you don't use dark mode:
+
+    gsettings set org.gnome.desktop.background picture-uri (your output url)
+
+    
