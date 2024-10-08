@@ -1,3 +1,2 @@
-goalenv/
 *.json
-assets/output_image.png
+./assets/output_image.png
