@@ -10,16 +10,14 @@ from PyQt5 import QtGui
 from PIL import Image, ImageDraw, ImageFont
 import traceback 
 
-basedir = os.path.dirname(__file__)
+basedir = os.path.dirname(__file__) # basedir = "/usr/share/goalScreener" in the package
 OUTPUT_IMG_PATH = os.path.join(basedir,"./assets/output_image.png")
 ICON_PATH  = os.path.join(basedir,"./assets/quest_icon.png")
 class WallpaperApp(QWidget):
     mainQ = {}
     sideQ = {}
-    icon_size = 100
     QUEST_LIMIT = 5
-    QUEST_BOX_LENGTH = 900
-    MAX_STR = 37
+    MAX_STR = 32
     TRACKING_COLOR=(72, 149, 147)
     selected_item = ''
     tracked_item = ''
@@ -232,13 +230,28 @@ class WallpaperApp(QWidget):
         try:
             img = Image.open(self.image_path)
             draw = ImageDraw.Draw(img)
-            font = ImageFont.truetype(self.FONT, 60)  
-            font2 = ImageFont.truetype(self.FONT, 35 )  
-            font3 = ImageFont.truetype(self.FONT_B, 80 )  
+            W, H = img.size
+            ICON_SIZE = int (W / 38.4)
+            QUEST_BOX_LENGTH = int(W / 4.26)
+            QUEST_BOX_HEIGHT = int (H /14.4)
+            QUEST_TITLE_X_POSITION = int (W / 20.211)
+            QUEST_TITLE_Y_POSITION = int (H / 9.2857)
+            QUEST_TXT_X_POSITION = int (QUEST_BOX_LENGTH/7.5)
+            QUEST_TXT_Y_POSITION_M = int ( QUEST_BOX_HEIGHT/6)
+            QUEST_TXT_Y_POSITION = int ( QUEST_BOX_HEIGHT/1.568)
+            FONT_TITLE = int(H/27)
+            FONT_QUEST = int(H/36)
+            FONT_DES = int (H/61.714)
+            text_gap = int (H/10.8)
+
 
             icon = Image.open(ICON_PATH)
-            icon = icon.resize((self.icon_size, self.icon_size))
-            
+            icon = icon.resize((ICON_SIZE, ICON_SIZE))
+
+            font = ImageFont.truetype(self.FONT_B, FONT_QUEST) # 60  
+            font2 = ImageFont.truetype(self.FONT, FONT_DES ) # 35 
+            font3 = ImageFont.truetype(self.FONT_B, FONT_TITLE ) # 80 
+
             def cut_text(quest, des):
                 def cut_at_space(text, max_len):
                     if len(text) > max_len:
@@ -256,8 +269,8 @@ class WallpaperApp(QWidget):
                 return quest, des
 
             # Image size
-            W, H = img.size
-            text_gap = 200 
+            
+           
             print(W,H)
             # quest limit
             
@@ -266,42 +279,38 @@ class WallpaperApp(QWidget):
             x_main = int(H / 5)  # Align to the left side
             
             # Drawing Quest Title 
-            draw.text((x_main + 190, y_main - 210), "MAIN QUESTS", fill="white",font=font3)
+            draw.text((x_main + QUEST_TITLE_X_POSITION , y_main - QUEST_TITLE_Y_POSITION), "MAIN QUESTS", fill="white",font=font3)
 
             # Coordinates for side quests (right side)
             y_side = y_main
-            x_side = W - x_main - 900  
+            x_side = W - x_main - QUEST_BOX_LENGTH  
             
             # Drawing Quest Title 
-            draw.text((x_side + 190, y_side - 210), "SIDE QUESTS", fill="white",font=font3)
+            draw.text((x_side + QUEST_TITLE_X_POSITION , y_side - QUEST_TITLE_Y_POSITION), "SIDE QUESTS", fill="white",font=font3)
 
             # Render Main Quests on the left
             for i, quest in enumerate(self.mainQ.keys()):
                 if i == self.QUEST_LIMIT:
                     break  # Limit to 4 main quests
                 des = self.mainQ[quest]
-                text,text2 = cut_text(quest,des)
-                
-                
-                # Draw rounded rectangle for main quest
-                
-                
+                text,text2 = cut_text(quest,des)                
+        
                 # Draw icon
                 if quest == self.tracked_item:
                     draw.rounded_rectangle(
-                    [(x_main  - 20, y_main - 20), (x_main + self.QUEST_BOX_LENGTH, y_main + 150)],
+                    [(x_main  - 20, y_main - 20), (x_main + QUEST_BOX_LENGTH, y_main + QUEST_BOX_HEIGHT)],
                     fill=(40, 39, 50), outline=self.TRACKING_COLOR, width=3, radius=20
                     )
                     icon_x = x_main 
-                    img.paste(icon, (int(icon_x), int(y_main + 10)), icon) 
+                    img.paste(icon, (int(icon_x), int(y_main + 4)), icon) 
                 else:   
                     draw.rounded_rectangle(
-                    [(x_main  - 20, y_main - 20), (x_main + self.QUEST_BOX_LENGTH, y_main + 150)],
+                    [(x_main  - 20, y_main - 20), (x_main + QUEST_BOX_LENGTH, y_main + QUEST_BOX_HEIGHT)],
                     fill=(40, 39, 50), outline="black", width=3, radius=20
                     )
                 # Draw text
-                draw.text((x_main + 120, y_main + 25), text, fill="white", font=font)
-                draw.text((x_main + 120, y_main + 95), text2, fill="white", font=font2)
+                draw.text((x_main + QUEST_TXT_X_POSITION, y_main + QUEST_TXT_Y_POSITION_M), text, fill="white", font=font)
+                draw.text((x_main + QUEST_TXT_X_POSITION, y_main + QUEST_TXT_Y_POSITION), text2, fill="white", font=font2)
                 
                 
                 # Update vertical position for the next quest
@@ -314,26 +323,27 @@ class WallpaperApp(QWidget):
                 
                 des = self.sideQ[quest]
                 text,text2 = cut_text(quest,des)
+
                 # Draw icon (aligned to the right)
                 if quest == self.tracked_item:
                     draw.rounded_rectangle(
-                        [(x_side - 20, y_side - 20), (x_side + self.QUEST_BOX_LENGTH, y_side + 150)],
+                        [(x_side - 20, y_side - 20), (x_side + QUEST_BOX_LENGTH, y_side + QUEST_BOX_HEIGHT)],
                         fill=(40, 39, 50), outline=self.TRACKING_COLOR, width=3, radius=20
                     )
                     icon_x = x_side   # Adjust icon position relative to the text
-                    img.paste(icon, (int(icon_x), int(y_side + 10)), icon)
+                    img.paste(icon, (int(icon_x), int(y_side + 4)), icon)
                 
                 else:
                 # Draw rounded rectangle for side quest
                     draw.rounded_rectangle(
-                        [(x_side - 20, y_side - 20), (x_side + self.QUEST_BOX_LENGTH, y_side + 150)],
+                        [(x_side - 20, y_side - 20), (x_side + QUEST_BOX_LENGTH, y_side + QUEST_BOX_HEIGHT)],
                         fill=(40, 39, 50), outline="black", width=3, radius=20
                     )
                 
                 
                 # Draw text (aligned to the right)
-                draw.text((x_side + 120, y_side + 25), text, fill="white", font=font)
-                draw.text((x_side + 120, y_side+ 95), text2, fill="white", font=font2)
+                draw.text((x_side + QUEST_TXT_X_POSITION , y_side + QUEST_TXT_Y_POSITION_M ), text, fill="white", font=font)
+                draw.text((x_side + QUEST_TXT_X_POSITION, y_side+ QUEST_TXT_Y_POSITION), text2, fill="white", font=font2)
                 
                 
                 
