@@ -10,9 +10,13 @@ from PyQt5 import QtGui
 from PIL import Image, ImageDraw, ImageFont
 import traceback 
 
-basedir = os.path.dirname(__file__) # basedir = "/usr/share/goalScreener" in the package
-OUTPUT_IMG_PATH = os.path.join(basedir,"./assets/output_image.png")
-ICON_PATH  = os.path.join(basedir,"./assets/quest_icon.png")
+if getattr(sys, 'frozen', False):  # If the app is frozen (compiled with PyInstaller)
+    basedir = sys._MEIPASS  # Use the temp folder where PyInstaller unpacks the app
+else:
+    basedir = os.path.dirname(__file__)  # For development purposes
+
+OUTPUT_IMG_PATH = os.path.join(basedir, "assets", "output_image.png")
+ICON_PATH = os.path.join(basedir, "assets", "quest_icon.png")
 class WallpaperApp(QWidget):
     mainQ = {}
     sideQ = {}
@@ -165,9 +169,11 @@ class WallpaperApp(QWidget):
             
     def writeD(self):
         with open(self.JSON_PATH, "w") as file:
-            data = [self.mainQ, self.sideQ,self.tracked_item,self.image_path]
-            json.dump(data, file, indent=4)
-
+            try:
+                data = [self.mainQ, self.sideQ,self.tracked_item,self.image_path]
+                json.dump(data, file, indent=4)
+            except Exception as e:
+                QMessageBox.warning(self,"ERROR",f"Failed to write : {e}")
     def add_task_main(self):
         quest = self.goal_input.text()
         des = self.goal_des.text()
@@ -361,7 +367,7 @@ class WallpaperApp(QWidget):
 
     def set_wallpaper_windows(self, image_path):
         try:
-            ctypes.windll.user32.SystemParametersInfoW(20, 0, os.path.join(self.path,image_path), 3)
+            ctypes.windll.user32.SystemParametersInfoW(20, 0, os.path.join(basedir,image_path), 3)
             QMessageBox.information(self, "Success", "Wallpaper set successfully!")
         except Exception as e:
             QMessageBox.critical(self, "Error", f"Failed to set wallpaper: {e}")
