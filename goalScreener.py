@@ -9,6 +9,8 @@ from PyQt5.QtGui import QPixmap, QColor
 from PyQt5 import QtGui
 from PIL import Image, ImageDraw, ImageFont
 import traceback 
+import yaml
+from datetime import datetime
 
 if getattr(sys, 'frozen', False):  # If the app is frozen (compiled with PyInstaller)
     basedir = sys._MEIPASS  # Use the temp folder where PyInstaller unpacks the app
@@ -23,12 +25,35 @@ class WallpaperApp(QWidget):
     QUEST_LIMIT = 5
     MAX_STR = 32
     TRACKING_COLOR=(72, 149, 147)
+    TRACKING_COLOR_INT= 7262512 #4740483
     selected_item = ''
     tracked_item = ''
     image_path =''
     FONT =os.path.join(basedir,"./assets/ComicMono.ttf")
     FONT_B = os.path.join(basedir,"./assets/ComicMono-Bold.ttf")
     JSON_PATH = os.path.join(basedir,"./assets/Quest.json")
+    YAML_PATH = os.path.join(basedir,"./assets/history.yaml")
+
+    def addHistory(self):
+        if not self.selected_item:
+            QMessageBox.warning(self,"ERROR",f"no Quest was selected")
+            return
+        with open(self.YAML_PATH,'r') as f:
+           data = yaml.safe_load(f) or {} 
+        item = ''
+        if self.selected_item in self.mainQ:
+            item = self.mainQ[self.selected_item]
+        if self.selected_item in self.sideQ:
+            item =  self.sideQ[self.selected_item]
+        quest = {'desription':f'{item}',
+                    'time':f'{datetime.now().strftime("%y-%m-%d %H:%M")}',  
+                }
+                  
+        data[f'{self.selected_item}'] = quest
+        # print(data)
+        with open(self.YAML_PATH,'w') as f:
+            yaml.dump(data,f,default_flow_style=False)
+
     def __init__(self):
         super().__init__()
         self.initUI()
@@ -90,7 +115,11 @@ class WallpaperApp(QWidget):
             self.track_label = QLabel("Tracking: Nothing Right Now")
         self.track_btn = QPushButton("Track")
         self.track_btn.clicked.connect(self.trackTask)
-
+        
+        #achieved button
+        self.achieve_btn = QPushButton("Achieved",self)
+        self.achieve_btn.clicked.connect(self.addHistory)
+        # remove button
         self.remove_btn = QPushButton("Remove", self)
         self.remove_btn.clicked.connect(self.removeTask)
 
@@ -102,6 +131,7 @@ class WallpaperApp(QWidget):
         bottom_layout.addWidget(self.goal_des)
         bottom_layout.addWidget(self.addTaskMain_btn)
         bottom_layout.addWidget(self.track_btn)
+        bottom_layout.addWidget(self.achieve_btn)
         bottom_layout.addWidget(self.remove_btn)
 
         # Add top and bottom sections to the main layout
@@ -165,7 +195,7 @@ class WallpaperApp(QWidget):
                 self.img_label.setPixmap(pixmap.scaled(200, 200))
                 self.track_label.setText(f"Tracking: {self.tracked_item}")
             except Exception as e:
-                print(f'Error:{e}')
+                # print(f'Error:{e}')
             
     def writeD(self):
         with open(self.JSON_PATH, "w") as file:
@@ -181,7 +211,7 @@ class WallpaperApp(QWidget):
             if quest not in self.mainQ.keys():
                 self.mainQ[quest] = des
                 self.update_quest_list()
-                print(self.mainQ)
+                # print(self.mainQ)
             else:
                 QMessageBox.warning(self, "Quest existing", "Please enter another Quest.")
             self.on_submit()
@@ -196,7 +226,7 @@ class WallpaperApp(QWidget):
             if quest not in self.sideQ.keys():
                 self.sideQ[quest] = des
                 self.update_quest_list()
-                print(self.sideQ)
+                # print(self.sideQ)
             else:
                 QMessageBox.warning(self, "Quest existing", "Please enter another Quest.")
             self.on_submit()
@@ -210,6 +240,11 @@ class WallpaperApp(QWidget):
             self.quest_list_widget.addItem(quest)
         for quest in self.sideQ.keys():
             self.quest_list_widget.addItem(quest)
+        if self.quest_list_widget.item(0):
+            # print(self.quest_list_widget.item(0).text())
+        for i in range(self.quest_list_widget.count()):
+            if self.quest_list_widget.item(i).text() == self.tracked_item:
+                self.quest_list_widget.item(i).setBackground(QColor(self.TRACKING_COLOR_INT))
 
     def on_quest_clicked(self, item):
         self.selected_item = item.text()
@@ -221,7 +256,9 @@ class WallpaperApp(QWidget):
         for i in range(self.quest_list_widget.count()):
             if self.quest_list_widget.item(i) == item:
                 self.quest_list_widget.item(i).setBackground(QColor('blue'))
-            else:
+            elif self.quest_list_widget.item(i).text() == self.tracked_item:
+                self.quest_list_widget.item(i).setBackground(QColor(self.TRACKING_COLOR_INT))
+            else:    
                 self.quest_list_widget.item(i).setBackground(QColor('white'))
 
     def upload_image(self):
@@ -277,7 +314,7 @@ class WallpaperApp(QWidget):
             # Image size
             
            
-            print(W,H)
+            # print(W,H)
             # quest limit
             
             # Coordinates for main quests (left side)
@@ -374,7 +411,7 @@ class WallpaperApp(QWidget):
 
     def set_wallpaper_linux(self, image_path):
         try:
-            #print(f"gsettings set org.gnome.desktop.background picture-uri-dark {os.path.join(basedir,image_path)}")
+            ## print(f"gsettings set org.gnome.desktop.background picture-uri-dark {os.path.join(basedir,image_path)}")
             os.system(f"gsettings set org.gnome.desktop.background picture-uri {os.path.join(basedir,image_path)}")
             os.system(f"gsettings set org.gnome.desktop.background picture-uri-dark {os.path.join(basedir,image_path)}")
             QMessageBox.information(self, "Success", f"Wallpaper set successfully! {image_path}")
@@ -398,7 +435,7 @@ class WallpaperApp(QWidget):
         self.writeD()
         output_image = self.generate_image_with_text()
         if output_image:
-            print(output_image)
+            # print(output_image)
             self.set_wallpaper(output_image)
 
 
